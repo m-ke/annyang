@@ -245,7 +245,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         }
 
         // Map the results to an array
-        var SpeechRecognitionResult = event.results[event.resultIndex];
+        // when using WebARCore results contain nested objects an the inner object contains the transcript
+        var SpeechRecognitionResult = event.results[event.resultIndex] || event.results.map(item => item[0]);
         var results = [];
         for (var k = 0; k < SpeechRecognitionResult.length; k++) {
           results[k] = SpeechRecognitionResult[k].transcript;
@@ -322,7 +323,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       autoRestart = false;
       autoRestartCount = 0;
       if (isInitialized()) {
-        recognition.abort();
+         try {
+          // works in chrome
+          recognition.abort();
+        } catch(e){
+          // works in WebARCore
+          recognition.stop() 
+        }
       }
     },
 
